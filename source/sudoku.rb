@@ -4,22 +4,22 @@ class Sudoku
   end
 
   def solve
-    count = 0
     # while solved? == false || count 81
-    while count < 81
-      @board.each_with_index do |cell, index|
-         if cell == "-"
-          [*1..9].each do |possibile_value|
+    until solved?
+      @board.each_with_index do |row,row_index|
+        row.each_with_index do |column, column_index|
+          possibilities(row_index,column_index)
 
-            cell = possibile_value
+         # if cell_column == "-"
+         #  [*1..9].each do |possibile_value|
+
+         #    cell = possibile_value
 
         #     if rows[index/9].include?(cell)
         end
-        puts "#{cell} , #{index}"
-        count +=1
+        # puts "#{cell} , #{index}"
+        # count +=1
       end
-
-
     end
   end
 
@@ -31,13 +31,28 @@ class Sudoku
     @board.each_slice(9).to_a
   end
 
+  def horizontal(row_index)
+    @board[row_index]
+  end
+
+  def vertical(column_index)
+    column = []
+    @board.map!{|row| row[column_index]}
+  end
+
   def columns
     rows.transpose
   end
 
-  def boxes
-    row_index = (index/9)/9
-    column_index = (index/9)%3
+  def boxes(row_index, column_index)
+    @board.each_with_index do |cell, boxes|
+    box_index = box_index_for(cell)
+    boxes[box_index] << cell
+  end
+
+  def possibilitie(row_index,column_index)
+    cell == (1..9).to_a - horizontal(row_index) - vertical(column_index) - boxes(row_index,column_index)
+    @board[row_index][column_index] = cell.length == 1 ? cell.join("") : "-"
   end
 
   def to_s
@@ -120,7 +135,6 @@ s = Sudoku.new('1-58-2----9--764-52--4--819-19--73-6762-83-9-----61-5---76---3-4
 p s.rows
 puts
 p s.columns
-
 p s.solve
 
 
