@@ -8,8 +8,7 @@ class Sudoku
       @board.each_with_index do |char, idx|
         if empty?(char)
           solve_char(idx)
-
-        end
+  end
       end
     end
   end
@@ -22,6 +21,10 @@ class Sudoku
     !@board.include?("-") && @board.count == 81
   end
 
+  def set_num(guess, idx)
+      @board[idx] = guess
+  end
+
   # def board
   # end
 
@@ -30,6 +33,9 @@ class Sudoku
 
     possible = not_possible - [nil, "-", '']
     possible.uniq == possible
+  def valid?(group)
+        group == group.uniq
+    # require 'pry-byebug'; binding pry-byebug
 
   end
 
@@ -42,7 +48,14 @@ class Sudoku
     @board[idx] = possible.sample
   # end
 
+    not_possible -= ["-"]
+    possible -= not_possible
+    counter = 0
+
+    @board[idx] = possible.sample
+    not_possible << @board[idx]
   end
+
 
   def create_box(position)
     blockIndex = calculate_box_index(position)
