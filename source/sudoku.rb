@@ -8,7 +8,7 @@ class Sudoku
       @board.each_with_index do |char, idx|
         if empty?(char)
           solve_char(idx)
-          # validate?
+
         end
       end
     end
@@ -19,22 +19,29 @@ class Sudoku
   end
 
   def solved?
-    !@board.include?("-")
+    !@board.include?("-") && @board.count == 81
   end
 
   # def board
   # end
 
-  def validate?(char, group)
-    group.count(char) == 1
+  def validate?(idx)
+    not_possible = [create_box(idx), create_col(idx), create_row(idx)].flatten
+
+    possible = not_possible - [nil, "-", '']
+    possible.uniq == possible
+
   end
 
   def solve_char(idx)
-    possible = (1..9).to_a
+    possible = ("1".."9").to_a
     not_possible = [create_box(idx), create_col(idx), create_row(idx)].flatten
 
-    possible -= not_possible
-    @board[idx] = possible[0]
+    p possible -= not_possible
+    # unless possible.first != []
+    @board[idx] = possible.sample
+  # end
+
   end
 
   def create_box(position)
@@ -103,6 +110,6 @@ class Sudoku
     @board.each_slice(9) do |slice|
       output << slice.join('   ') + "\n\n"
     end
-    output
+     output
   end
 end
