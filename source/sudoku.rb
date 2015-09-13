@@ -4,21 +4,14 @@ class Sudoku
   end
 
   def solve
-    # while solved? == false || count 81
     until solved?
-      @board.each_with_index do |row,row_index|
-        row.each_with_index do |column, column_index|
-          possibilities(row_index,column_index)
-
-         # if cell_column == "-"
-         #  [*1..9].each do |possibile_value|
-
-         #    cell = possibile_value
-
-        #     if rows[index/9].include?(cell)
+      # call guess somewhere
+      @board.each_with_index do |cell, index|
+        if cell == "-"
+          cell = possibilities(index)
+          @board[index] = cell[0].to_s if cell.length == 1
         end
-        # puts "#{cell} , #{index}"
-        # count +=1
+        system 'clear'; p @board; sleep 0.01
       end
     end
   end
@@ -27,119 +20,89 @@ class Sudoku
     @board.include?("-") !=true
   end
 
-  def rows
-    @board.each_slice(9).to_a
+  def row_values(index)
+    value_of_row = index/9
+    array_to_check_for_possibilities =[]
+    @board.each_with_index do |cell, index|
+      if index/ 9 == value_of_row
+        array_to_check_for_possibilities << cell
+      end
+    end
+    array_to_check_for_possibilities
   end
 
-  def horizontal(row_index)
-    @board[row_index]
+  def col_values(index)
+    value_of_col = index%9
+    array_to_check_for_possibilities =[]
+    @board.each_with_index do |cell, index|
+      if index% 9 == value_of_col
+        array_to_check_for_possibilities << cell
+      end
+    end
+    array_to_check_for_possibilities
   end
 
-  def vertical(column_index)
-    column = []
-    @board.map!{|row| row[column_index]}
+  def box_values(index)
+    value_of_box = (index/9/3*3) + (index%9/3)
+    array_to_check_for_possibilities =[]
+    @board.each_with_index do |cell, index|
+      if (index/9/3*3) + (index%9/3) == value_of_box
+        array_to_check_for_possibilities << cell
+      end
+    end
+    array_to_check_for_possibilities
   end
 
-  def columns
-    rows.transpose
+  def box_index(index)
+    (index/9/3*3) + (index%9/3)
+    # http://stackoverflow.com/questions/16872773/sudoku-box-indices-start-position?lq=1
   end
 
-  def boxes(row_index, column_index)
-    @board.each_with_index do |cell, boxes|
-    box_index = box_index_for(cell)
+  def boxes
+  boxes = Array.new(9) {Array.new}
+  @board.each_with_index do |cell, index|
+    box_index = box_index(index)
     boxes[box_index] << cell
   end
+  boxes
+end
 
-  def possibilitie(row_index,column_index)
-    cell == (1..9).to_a - horizontal(row_index) - vertical(column_index) - boxes(row_index,column_index)
-    @board[row_index][column_index] = cell.length == 1 ? cell.join("") : "-"
-  end
+def possibilities(index)
+  possible_values = ['1','2','3','4','5','6','7','8','9']
+  possible_values -= row_values(index)
+  possible_values -= col_values(index)
+  possible_values -= box_values(index)
+  possible_values
+end
 
-  def to_s
-    rows.map!{|row| row.join("")}.join('\n')
-  end
+# def guess(array_to_guess_from)
+#   used_guesses = []
+#   guess_chosen = array_to_guess_from.sample
+#   used_guesses << guess_chosen
+#   array_to_guess_from -= used_guesses
+# end
+
+def to_s
+  @board.each_slice(9).map {|row| row.join(" ")}.join("\n")
+
+end
 
 end
 
 
-
-
-#   attr_accessor :possibile_values
-#   def initialize(board_string)
-#     @board = board_string.split("")
-#     @possible_values = (1..9).to_a
-#   end
-
-#   def possibilities(cell,index)
-#     cell_row = cell.to_i/9
-#     cell_column = cell.to_i%9
-#     cell_box = (cell.to_i/3)*3 && (cell.to_i/3)*3
-#     possibile_values.select{|index| check_row(index,cell_row) && check_col(index,cell_column) && check_box(index,cell_column)}
-#   end
-
-#   def finished?
-#     @board.to_a.include?("-") != true
-#   end
-
-#   def solve
-
-#   end
-
-#   def board
-#   end
-
-#   def check_row(index)  #check row for the values it has & manipulate possibile_values array
-#     row_that_number_is_in = index/9
-
-#     indicies_to_check_that_are_in_the_row = (0..80).select{|index| (index/9) == row_that_number_is_in}
-#     @board[indicies_to_check_that_are_in_the_row].each do |cell|
-#       if possibile_values.include?(cell)
-#         possibile_values.delete(cell)
-#       end
-#     end
-#     return possibile_values = [6,9]
-#   end
-
-#   def check_col(index) #check column for the values it has & manipulate possibile_values array
-#     column_that_number_is_in = index%9
-#     indicies_to_check_that_are_in_the_column = (0..80).select{|index| (index%9) == column_that_number_is_in}
-#     @board[indicies_to_check_that_are_in_the_column].each do |cell|
-#       if possibile_values.include?(cell)
-#         possibile_values.delete(cell)
-#       end
-#     end
-#     return possibile_values
-#   end
-
-#   def check_box(index)  #check box for the values it has & manipulate possibile_values array
-#     column_index = index%9
-#     row_index = index/9
-#     # box = "#{row_that_number_is_in} , #{column_that_number_is_in}"
-#     indicies_to_check_that_are_in_the_box = (0..80).select {|index| (index/9)/9 == row_index  && (index/9)%3 == column_index}  # format is row && column
-#     @board[indicies_to_check_that_are_in_the_box].each do |cell|
-#       if possibile_values.include?(cell)
-#         possibile_values.delete(cell)
-#       end
-#     end
-#     return possibile_values
-#   end
-
-#   # Returns a string representing the current state of the board
-#   def to_s
-#     # @board.map!{|row| row.join("")}.join('\n')
-#   end
-# end
-
-
 s = Sudoku.new('1-58-2----9--764-52--4--819-19--73-6762-83-9-----61-5---76---3-43--2-5-16--3-89--')
-p s.rows
+t = Sudoku.new('123456780123456780123456780123456780123456780123456780123456780123456780123456780')
+# p s.rows
 puts
-p s.columns
-p s.solve
+puts "boxes : #{s.box_index(8)}"
+puts "rows : #{s.row_values(8)}"
+puts "columns : #{s.col_values(8)}"
+puts "boxess : #{s.box_values(8)}"
+p s.possibilities(62)
+# p s.columns
+# p s.box_index(62)
+# p t.boxes
+# p s.solve
 
 
-   # row = (0..80).select{|index| (index/9) == row}
-   #  row.each do |index_of_row|
-   #    return false if board[index_of_row] == num
-   #  end
-   #  true
+
